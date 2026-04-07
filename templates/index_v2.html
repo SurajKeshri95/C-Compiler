@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced C Compiler IDE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to right, #161b22, #0d1117);
+            border-bottom: 1px solid #30363d;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f0883e;
+            letter-spacing: 0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #30363d;
+            background: #161b22;
+            color: #c9d1d9;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #21262d;
+            border-color: #444c56;
+        }
+
+        .btn.primary {
+            background: #238636;
+            border-color: #2ea043;
+            color: #ffffff;
+        }
+
+        .btn.primary:hover {
+            background: #2ea043;
+        }
+
+        .btn.danger {
+            background: #da3633;
+            border-color: #f85149;
+            color: #ffffff;
+        }
+
+        .btn.danger:hover {
+            background: #f85149;
+        }
+
+        /* Status bar */
+        .status-bar {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 6px 20px;
+            font-size: 12px;
+            color: #8b949e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        /* Editor section */
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #30363d;
+            overflow: hidden;
+        }
+
+        .editor-label {
+            background: #161b22;
+            padding: 8px 20px;
+            border-bottom: 1px solid #30363d;
+            font-size: 12px;
+            color: #8b949e;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .CodeMirror {
+            flex: 1 !important;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+            font-size: 14px !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: #6e7681;
+        }
+
+        /* Right panel */
+        .right-panel {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 0;
+        }
+
+        .panel-tab {
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: #8b949e;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .panel-tab:hover {
+            color: #c9d1d9;
+        }
+
+        .panel-tab.active {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: none;
+        }
+
+        .panel-content.active {
+            display: block;
+        }
+
+        /* Output */
+        .output-box {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #79c0ff;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #0d1117;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        .output-box.empty {
+            color: #6e7681;
+            font-style: italic;
+        }
+
+        /* Error display */
+        .error-container {
+            background: #3d1f1a;
+            border: 1px solid #da3633;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #f85149;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: #c9d1d9;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .error-context {
+            background: #161b22;
+            border-left: 3px solid #da3633;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+            color: #8b949e;
+            overflow-x: auto;
+        }
+
+        .error-location {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 8px;
+        }
+
+        /* Variables inspector */
+        .var-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .var-item {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .var-name {
+            color: #79c0ff;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .var-type {
+            color: #8b949e;
+            font-size: 11px;
+        }
+
+        .var-value {
+            color: #7ee787;
+            font-family: monospace;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        /* Performance stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            color: #58a6ff;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        /* Animations */
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #30363d;
+            border-top-color: #58a6ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            color: #3fb950;
+        }
+
+        .error-icon {
+            color: #f85149;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444c56;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 C Compiler</h1>
+        <div class="header-controls">
+            <button class="btn primary" id="run-btn" onclick="compileAndRun()">
+                <span>▶</span> Run
+            </button>
+            <button class="btn" onclick="clearEditor()">Clear</button>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-item">
+            <span id="status-text">Ready</span>
+        </div>
+        <div class="status-item">
+            <span id="line-col">Line 1, Col 1</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Editor -->
+        <div class="editor-section">
+            <div class="editor-label">main.c</div>
+            <textarea id="editor"></textarea>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="panel-tabs">
+                <button class="panel-tab active" onclick="switchTab('output')">Output</button>
+                <button class="panel-tab" onclick="switchTab('errors')">Errors</button>
+                <button class="panel-tab" onclick="switchTab('variables')">Variables</button>
+                <button class="panel-tab" onclick="switchTab('stats')">Statistics</button>
+                <button class="panel-tab" onclick="switchTab('About')">About</button>
+                
+            </div>
+
+            <div id="output" class="panel-content active">
+                <div id="output-box" class="output-box empty">Run your code to see output</div>
+            </div>
+
+            <div id="errors" class="panel-content">
+                <div id="errors-box" style="color: #8b949e; font-style: italic;">No errors</div>
+            </div>
+
+            <div id="variables" class="panel-content">
+                <div id="variables-box" style="color: #8b949e; font-style: italic;">No variables</div>
+            </div>
+            <div id="About" class="panel-content">
+                <div id="About" style="color: #8b949e; font-style: italic;">Developer :- Suraj Keshri<br>Bharati vidyapeeth college of engineering</br></div>
+            </div>
+
+            <div id="stats" class="panel-content">
+                <div class="stats-grid" id="stats-box">
+                    <div class="stat-card">
+                        <div class="stat-label">Compile Time</div>
+                        <div class="stat-value">0ms</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tokens</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Instructions</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" style="color: #8b949e;">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+
+    <script>
+        // Initialize CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            mode: 'text/x-csrc',
+            theme: 'monokai',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            indentWithTabs: false,
+            lineWrapping: true,
+            styleActiveLine: true,
+        });
+
+        // Sample code
+        const sampleCode = `int main() {
+        printf("Hello, Suraj!");
+    return 0;
+}`;
+
+        editor.setValue(sampleCode);
+
+        // Update line/col display
+        editor.on('cursorActivity', () => {
+            const pos = editor.getCursor();
+            document.getElementById('line-col').textContent = 
+                `Line ${pos.line + 1}, Col ${pos.ch + 1}`;
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.panel-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.panel-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function compileAndRun() {
+            const code = editor.getValue();
+            const runBtn = document.getElementById('run-btn');
+            const statusText = document.getElementById('status-text');
+
+            runBtn.disabled = true;
+            statusText.innerHTML = '<span class="spinner"></span> Compiling...';
+
+            try {
+                const response = await fetch('/api/compile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('output-box').innerHTML = 
+                        `<span class="success-icon">✓</span> ${escapeHtml(result.output || '[No output]')}`;
+                    document.getElementById('errors-box').innerHTML = 
+                        '<span style="color: #8b949e; font-style: italic;">No errors</span>';
+                    statusText.innerHTML = '<span class="success-icon">✓</span> Success';
+
+                    // Update stats
+                    document.querySelector('#stats-box .stat-value').textContent = 
+                        Math.round(result.stats.time_ms) + 'ms';
+                    const stats = document.querySelectorAll('#stats-box .stat-value');
+                    stats[1].textContent = result.stats.tokens;
+                    stats[2].textContent = result.stats.instructions;
+                    stats[3].textContent = 'OK';
+                    stats[3].style.color = '#3fb950';
+                } else {
+                    const error = result.error;
+                    let errorHtml = `<div class="error-container">
+                        <div class="error-header">
+                            <span class="error-icon">✕</span> 
+                            ${error.type} in ${result.phase || 'Compilation'}
+                        </div>
+                        <div class="error-message">${escapeHtml(error.message)}</div>`;
+                    
+                    if (error.context) {
+                        errorHtml += `<div class="error-context">${escapeHtml(error.context)}</div>`;
+                    }
+                    
+                    if (error.line > 0) {
+                        errorHtml += `<div class="error-location">at line ${error.line}${error.column ? `, column ${error.column}` : ''}</div>`;
+                    }
+                    
+                    errorHtml += '</div>';
+                    
+                    document.getElementById('errors-box').innerHTML = errorHtml;
+                    document.getElementById('output-box').innerHTML = 
+                        '<span style="color: #f85149;">Compilation failed</span>';
+                    
+                    statusText.innerHTML = '<span class="error-icon">✕</span> Error';
+
+                    // Jump to errors tab
+                    document.querySelector('[onclick="switchTab(\'errors\')"]').click();
+                }
+            } catch (e) {
+                document.getElementById('errors-box').innerHTML = 
+                    `<div style="color: #f85149;">Network error: ${escapeHtml(e.message)}</div>`;
+                statusText.innerHTML = '<span class="error-icon">✕</span> Connection failed';
+            } finally {
+                runBtn.disabled = false;
+            }
+        }
+
+        function clearEditor() {
+            if (confirm('Clear all code?')) {
+                editor.setValue('');
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                compileAndRun();
+            }
+        });
+    </script>
+</body>
+</html>
