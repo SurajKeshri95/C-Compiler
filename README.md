@@ -872,22 +872,6 @@ Instructions: 89
 
 ---
 
-## 📞 Troubleshooting
-
-**Q: Port 5000 is in use**
-A: Edit `app.py` and change `port=5000` to `port=5001`
-
-**Q: "No module named flask"**
-A: Run `pip install flask`
-
-**Q: Template not found**
-A: Verify `templates/index.html` exists
-
-**Q: Weird compilation errors**
-A: Make sure all files are in correct folders (see file structure above)
-
----
-
 ## ✨ Next Steps
 
 1. ✅ Set up the compiler (follow SETUP.md)
