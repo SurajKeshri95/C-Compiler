@@ -355,6 +355,208 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #444c56;
         }
+
+        /* ── Token Modal ─────────────────────────────── */
+        .token-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .token-modal-overlay.open {
+            display: flex;
+        }
+        .token-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            width: 92vw;
+            max-width: 860px;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .token-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid #30363d;
+            background: #0d1117;
+        }
+        .token-modal-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f0883e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .token-modal-meta {
+            font-size: 12px;
+            color: #8b949e;
+            margin-left: 10px;
+        }
+        .token-modal-close {
+            background: none;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            border-radius: 5px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .token-modal-close:hover {
+            background: #da3633;
+            border-color: #f85149;
+            color: #fff;
+        }
+        /* Filter bar */
+        .token-filter-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #21262d;
+            flex-wrap: wrap;
+            background: #161b22;
+        }
+        .token-filter-btn {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+            background: #0d1117;
+            color: #8b949e;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .token-filter-btn:hover {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+        .token-filter-btn.active {
+            background: #1f3044;
+            border-color: #58a6ff;
+            color: #58a6ff;
+            font-weight: 600;
+        }
+        /* Token table */
+        .token-table-wrap {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        .token-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .token-table thead th {
+            position: sticky;
+            top: 0;
+            background: #0d1117;
+            padding: 9px 14px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #8b949e;
+            border-bottom: 1px solid #30363d;
+        }
+        .token-table tbody tr {
+            border-bottom: 1px solid #21262d;
+            transition: background 0.1s;
+        }
+        .token-table tbody tr:hover {
+            background: #1c2128;
+        }
+        .token-table td {
+            padding: 7px 14px;
+            vertical-align: middle;
+        }
+        /* Token index */
+        .tok-index {
+            color: #484f58;
+            font-family: monospace;
+            width: 40px;
+        }
+        /* Token type badge */
+        .tok-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+        }
+        .tok-badge.cat-keyword   { background:#2d1b4e; color:#d2a8ff; border:1px solid #6e40c9; }
+        .tok-badge.cat-identifier{ background:#0d2e1a; color:#7ee787; border:1px solid #2ea043; }
+        .tok-badge.cat-literal   { background:#1a2d0d; color:#a5d6a7; border:1px solid #388e3c; }
+        .tok-badge.cat-string    { background:#1a2a0a; color:#c6e48b; border:1px solid #4caf50; }
+        .tok-badge.cat-char      { background:#152d14; color:#b9f6ca; border:1px solid #43a047; }
+        .tok-badge.cat-operator  { background:#1a1f0d; color:#e6c07b; border:1px solid #856404; }
+        .tok-badge.cat-delimiter { background:#0d1f2d; color:#79c0ff; border:1px solid #1f6feb; }
+        .tok-badge.cat-eof       { background:#21262d; color:#484f58; border:1px solid #30363d; }
+        /* Token value */
+        .tok-value {
+            font-family: 'Monaco','Menlo','Ubuntu Mono',monospace;
+            color: #c9d1d9;
+            background: #0d1117;
+            padding: 2px 7px;
+            border-radius: 4px;
+            border: 1px solid #21262d;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        /* Location */
+        .tok-loc {
+            color: #6e7681;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        /* Empty / loading states */
+        .token-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #484f58;
+            font-style: italic;
+            font-size: 13px;
+        }
+        /* Tokens stat card — clickable */
+        .stat-card.clickable {
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+            position: relative;
+        }
+        .stat-card.clickable:hover {
+            border-color: #58a6ff;
+            background: #1f3044;
+            transform: translateY(-1px);
+        }
+        .stat-card.clickable:hover .stat-label { color: #58a6ff; }
+        .tok-hint {
+            font-size: 10px;
+            color: #484f58;
+            margin-top: 4px;
+            display: block;
+        }
+        .stat-card.clickable:hover .tok-hint { color: #8b949e; }
     </style>
 </head>
 <body>
@@ -416,9 +618,10 @@
                         <div class="stat-label">Compile Time</div>
                         <div class="stat-value">0ms</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Tokens</div>
-                        <div class="stat-value">0</div>
+                    <div class="stat-card clickable" id="tokens-card" onclick="openTokenModal()" title="Click to view all tokens">
+                        <div class="stat-label">🔠 Tokens</div>
+                        <div class="stat-value" id="tokens-count">0</div>
+                        <span class="tok-hint">click to explore ↗</span>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Instructions</div>
@@ -429,6 +632,47 @@
                         <div class="stat-value" style="color: #8b949e;">—</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Token Viewer Modal ───────────────────────────────── -->
+    <div class="token-modal-overlay" id="token-modal-overlay" onclick="handleOverlayClick(event)">
+        <div class="token-modal">
+            <div class="token-modal-header">
+                <div class="token-modal-title">
+                    🔠 Token Stream
+                    <span class="token-modal-meta" id="token-modal-meta"></span>
+                </div>
+                <button class="token-modal-close" onclick="closeTokenModal()" title="Close">✕</button>
+            </div>
+
+            <div class="token-filter-bar" id="token-filter-bar">
+                <button class="token-filter-btn active" onclick="filterTokens('ALL', this)">All</button>
+                <button class="token-filter-btn" onclick="filterTokens('keyword', this)">Keywords</button>
+                <button class="token-filter-btn" onclick="filterTokens('identifier', this)">Identifiers</button>
+                <button class="token-filter-btn" onclick="filterTokens('literal', this)">Numbers</button>
+                <button class="token-filter-btn" onclick="filterTokens('string', this)">Strings</button>
+                <button class="token-filter-btn" onclick="filterTokens('char', this)">Chars</button>
+                <button class="token-filter-btn" onclick="filterTokens('operator', this)">Operators</button>
+                <button class="token-filter-btn" onclick="filterTokens('delimiter', this)">Delimiters</button>
+            </div>
+
+            <div class="token-table-wrap">
+                <table class="token-table" id="token-table">
+                    <thead>
+                        <tr>
+                            <th class="tok-index">#</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="token-tbody">
+                        <tr><td colspan="5" class="token-empty">Run your code first to see tokens.</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -504,6 +748,20 @@
                     stats[2].textContent = result.stats.instructions;
                     stats[3].textContent = 'OK';
                     stats[3].style.color = '#3fb950';
+
+                    // Store tokens and build the token table
+                    if (result.tokens) {
+                        window._lastTokens = result.tokens;
+                        _allTokens = result.tokens;
+                        buildTokenTable(result.tokens);
+                        document.getElementById('tokens-count').textContent = result.tokens.length;
+                    } else {
+                        // No tokens array returned — build from editor source
+                        const synthetic = buildSyntheticTokens(editor.getValue());
+                        _allTokens = synthetic;
+                        buildTokenTable(synthetic);
+                        document.getElementById('tokens-count').textContent = result.stats.tokens;
+                    }
                 } else {
                     const error = result.error;
                     let errorHtml = `<div class="error-container">
@@ -558,7 +816,245 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Keyboard shortcuts
+        // ── Token Modal ────────────────────────────────────────
+
+        // Classify a token type string into a display category
+        const KEYWORDS = new Set([
+            'INT','FLOAT','CHAR','VOID','IF','ELSE','WHILE','FOR','DO',
+            'RETURN','STRUCT','SIZEOF','BREAK','CONTINUE','STATIC','CONST'
+        ]);
+        const OPERATORS = new Set([
+            'PLUS','MINUS','MUL','DIV','MOD','ASSIGN','EQ','NEQ','LT','GT',
+            'LE','GE','AND','OR','NOT','INC','DEC','AMP','ARROW',
+            'PLUS_ASSIGN','MINUS_ASSIGN','MUL_ASSIGN','DIV_ASSIGN','QUESTION','COLON'
+        ]);
+        const DELIMITERS = new Set([
+            'SEMI','COMMA','DOT','ELLIPSIS','LPAREN','RPAREN',
+            'LBRACE','RBRACE','LBRACKET','RBRACKET'
+        ]);
+
+        function classifyToken(type) {
+            if (type === 'EOF')      return { cat: 'eof',        label: 'EOF',        cssClass: 'cat-eof' };
+            if (KEYWORDS.has(type))  return { cat: 'keyword',    label: 'Keyword',    cssClass: 'cat-keyword' };
+            if (type === 'ID')       return { cat: 'identifier', label: 'Identifier', cssClass: 'cat-identifier' };
+            if (type === 'NUMBER' || type === 'FLOAT_NUM')
+                                     return { cat: 'literal',    label: 'Number',     cssClass: 'cat-literal' };
+            if (type === 'STRING')   return { cat: 'string',     label: 'String',     cssClass: 'cat-string' };
+            if (type === 'CHAR_LIT') return { cat: 'char',       label: 'Char',       cssClass: 'cat-char' };
+            if (OPERATORS.has(type)) return { cat: 'operator',   label: 'Operator',   cssClass: 'cat-operator' };
+            if (DELIMITERS.has(type))return { cat: 'delimiter',  label: 'Delimiter',  cssClass: 'cat-delimiter' };
+            return                          { cat: 'operator',   label: type,         cssClass: 'cat-operator' };
+        }
+
+        // Build a synthetic token list from source code when the backend
+        // doesn't return tokens (client-side mini-lexer for display)
+        function buildSyntheticTokens(source) {
+            const tokens = [];
+            let i = 0, line = 1, col = 1;
+
+            const KWORDS = {
+                int:'INT', float:'FLOAT', char:'CHAR', void:'VOID',
+                if:'IF', else:'ELSE', while:'WHILE', for:'FOR', do:'DO',
+                return:'RETURN', struct:'STRUCT', sizeof:'SIZEOF',
+                break:'BREAK', continue:'CONTINUE', static:'STATIC', const:'CONST'
+            };
+
+            function advance() {
+                const ch = source[i++];
+                if (ch === '\n') { line++; col = 1; } else { col++; }
+                return ch;
+            }
+
+            while (i < source.length) {
+                const startLine = line, startCol = col;
+                const ch = source[i];
+
+                // Whitespace
+                if (/\s/.test(ch)) { advance(); continue; }
+
+                // Line comment
+                if (ch === '/' && source[i+1] === '/') {
+                    while (i < source.length && source[i] !== '\n') advance();
+                    continue;
+                }
+                // Block comment
+                if (ch === '/' && source[i+1] === '*') {
+                    advance(); advance();
+                    while (i < source.length - 1 && !(source[i]==='*' && source[i+1]==='/')) advance();
+                    advance(); advance();
+                    continue;
+                }
+
+                // String literal
+                if (ch === '"') {
+                    advance(); let val = '"';
+                    while (i < source.length && source[i] !== '"') {
+                        if (source[i] === '\\') { val += advance(); }
+                        val += advance();
+                    }
+                    val += '"'; if (i < source.length) advance();
+                    tokens.push({ type:'STRING', value: val, line: startLine, column: startCol });
+                    continue;
+                }
+
+                // Char literal
+                if (ch === "'") {
+                    advance(); let val = "'";
+                    if (source[i] === '\\') { val += advance(); }
+                    if (i < source.length) val += advance();
+                    if (source[i] === "'") { val += "'"; advance(); }
+                    tokens.push({ type:'CHAR_LIT', value: val, line: startLine, column: startCol });
+                    continue;
+                }
+
+                // Number
+                if (/\d/.test(ch)) {
+                    let num = '';
+                    while (i < source.length && /\d/.test(source[i])) num += advance();
+                    if (source[i] === '.' && /\d/.test(source[i+1])) {
+                        num += advance();
+                        while (i < source.length && /\d/.test(source[i])) num += advance();
+                        tokens.push({ type:'FLOAT_NUM', value: num, line: startLine, column: startCol });
+                    } else {
+                        tokens.push({ type:'NUMBER', value: num, line: startLine, column: startCol });
+                    }
+                    continue;
+                }
+
+                // Identifier / keyword
+                if (/[a-zA-Z_]/.test(ch)) {
+                    let word = '';
+                    while (i < source.length && /\w/.test(source[i])) word += advance();
+                    const type = KWORDS[word] || 'ID';
+                    tokens.push({ type, value: word, line: startLine, column: startCol });
+                    continue;
+                }
+
+                // Multi-char operators
+                const two = source.slice(i, i+2);
+                const threeCharOps = { '...':'ELLIPSIS' };
+                const twoCharOps = {
+                    '==':'EQ','!=':'NEQ','<=':'LE','>=':'GE','&&':'AND','||':'OR',
+                    '++':'INC','--':'DEC','+=':'PLUS_ASSIGN','-=':'MINUS_ASSIGN',
+                    '*=':'MUL_ASSIGN','/=':'DIV_ASSIGN','->':'ARROW'
+                };
+                const oneCharOps = {
+                    '+':'PLUS','-':'MINUS','*':'MUL','/':'DIV','%':'MOD',
+                    '=':'ASSIGN','<':'LT','>':'GT','!':'NOT','&':'AMP',
+                    ';':'SEMI',',':'COMMA','.':'DOT','(':'LPAREN',')':'RPAREN',
+                    '{':'LBRACE','}':'RBRACE','[':'LBRACKET',']':'RBRACKET',
+                    '?':'QUESTION',':':'COLON'
+                };
+
+                if (source.slice(i, i+3) === '...') {
+                    tokens.push({ type:'ELLIPSIS', value:'...', line:startLine, column:startCol });
+                    advance(); advance(); advance();
+                } else if (twoCharOps[two]) {
+                    tokens.push({ type:twoCharOps[two], value:two, line:startLine, column:startCol });
+                    advance(); advance();
+                } else if (oneCharOps[ch]) {
+                    advance();
+                    tokens.push({ type:oneCharOps[ch], value:ch, line:startLine, column:startCol });
+                } else {
+                    advance(); // skip unknown
+                }
+            }
+
+            tokens.push({ type:'EOF', value:'(end)', line, column: col });
+            return tokens;
+        }
+
+        let _allTokens = [];
+        let _activeFilter = 'ALL';
+
+        function buildTokenTable(tokens) {
+            _allTokens = tokens;
+            _activeFilter = 'ALL';
+            // Reset filter buttons
+            document.querySelectorAll('.token-filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.token-filter-btn').classList.add('active');
+            renderTokenTable(tokens);
+        }
+
+        function renderTokenTable(tokens) {
+            const tbody = document.getElementById('token-tbody');
+            if (!tokens || tokens.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="token-empty">No tokens found.</td></tr>';
+                return;
+            }
+
+            // Category breakdown counts
+            const counts = {};
+            tokens.forEach(t => {
+                const c = classifyToken(t.type).cat;
+                counts[c] = (counts[c] || 0) + 1;
+            });
+
+            document.getElementById('token-modal-meta').textContent =
+                `${tokens.length} tokens  |  ` +
+                Object.entries(counts).map(([k,v]) => `${v} ${k}s`).join('  ·  ');
+
+            tbody.innerHTML = tokens.map((tok, idx) => {
+                const cls = classifyToken(tok.type);
+                const rawVal = tok.value === null || tok.value === undefined ? '' : String(tok.value);
+                const displayVal = rawVal.length > 30 ? rawVal.slice(0,28) + '…' : rawVal;
+                const escapedVal = displayVal.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const loc = (tok.line || tok.line === 0) ? `${tok.line}:${tok.column}` : '—';
+                return `<tr data-cat="${cls.cat}">
+                    <td class="tok-index">${idx + 1}</td>
+                    <td><code class="tok-badge ${cls.cssClass}">${tok.type}</code></td>
+                    <td><span class="tok-value">${escapedVal || '<i style="color:#484f58">—</i>'}</span></td>
+                    <td style="color:#8b949e;font-size:12px;">${cls.label}</td>
+                    <td class="tok-loc">${loc}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterTokens(cat, btn) {
+            _activeFilter = cat;
+            document.querySelectorAll('.token-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const rows = document.querySelectorAll('#token-tbody tr[data-cat]');
+            rows.forEach(row => {
+                row.style.display = (cat === 'ALL' || row.dataset.cat === cat) ? '' : 'none';
+            });
+        }
+
+        function openTokenModal() {
+            // If no tokens stored yet, build from editor source
+            if (!_allTokens || _allTokens.length === 0) {
+                const src = editor.getValue();
+                if (!src.trim()) {
+                    alert('Write some code first, then click Run to generate tokens!');
+                    return;
+                }
+                const synthetic = buildSyntheticTokens(src);
+                buildTokenTable(synthetic);
+            }
+            _activeFilter = 'ALL';
+            document.querySelectorAll('.token-filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.token-filter-btn').classList.add('active');
+            const rows = document.querySelectorAll('#token-tbody tr[data-cat]');
+            rows.forEach(r => r.style.display = '');
+            document.getElementById('token-modal-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTokenModal() {
+            document.getElementById('token-modal-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === document.getElementById('token-modal-overlay')) closeTokenModal();
+        }
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeTokenModal();
+        });
+
+        // ── Keyboard shortcuts ──────────────────────────────────
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 compileAndRun();
