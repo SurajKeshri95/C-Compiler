@@ -356,7 +356,86 @@
             background: #444c56;
         }
 
-        /* ── Token Modal ─────────────────────────────── */
+        /* ── IR Code Viewer ──────────────────────────── */
+        .ir-empty {
+            color: #6e7681;
+            font-style: italic;
+            font-size: 13px;
+            padding: 20px 4px;
+        }
+        .ir-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ir-meta {
+            font-size: 12px;
+            color: #8b949e;
+        }
+        .ir-copy-btn {
+            padding: 4px 12px;
+            border-radius: 5px;
+            border: 1px solid #30363d;
+            background: #161b22;
+            color: #8b949e;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ir-copy-btn:hover { border-color:#58a6ff; color:#58a6ff; }
+        .ir-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .ir-table thead th {
+            background: #0d1117;
+            padding: 7px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #8b949e;
+            border-bottom: 1px solid #30363d;
+            position: sticky;
+            top: 0;
+        }
+        .ir-table tbody tr {
+            border-bottom: 1px solid #21262d;
+            transition: background 0.1s;
+        }
+        .ir-table tbody tr:hover { background: #1c2128; }
+        .ir-table td { padding: 6px 12px; vertical-align: middle; }
+        .ir-idx { color: #484f58; font-family: monospace; width: 36px; }
+        .ir-func-row td { background: #0d2230 !important; }
+        .ir-label-row td { background: #1a1a0d !important; }
+        .ir-badge {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+        .ir-op-func     { background:#0d2230; color:#79c0ff; border:1px solid #1f6feb; }
+        .ir-op-label    { background:#1a1a0d; color:#e6c07b; border:1px solid #856404; }
+        .ir-op-jump     { background:#1a0d1a; color:#d2a8ff; border:1px solid #6e40c9; }
+        .ir-op-call     { background:#0d2e1a; color:#7ee787; border:1px solid #2ea043; }
+        .ir-op-return   { background:#2d1b1a; color:#ffa198; border:1px solid #da3633; }
+        .ir-op-assign   { background:#1a1f0d; color:#c6e48b; border:1px solid #4caf50; }
+        .ir-op-arith    { background:#1a150d; color:#f0883e; border:1px solid #9e6a03; }
+        .ir-op-default  { background:#21262d; color:#8b949e; border:1px solid #30363d; }
+        .ir-args { font-family: monospace; color: #c9d1d9; font-size: 12px; }
+        .ir-args .ir-temp { color: #79c0ff; }
+        .ir-args .ir-var  { color: #7ee787; }
+        .ir-args .ir-str  { color: #c6e48b; }
+        .ir-args .ir-num  { color: #f0883e; }
+        .ir-args .ir-arrow{ color: #8b949e; }
+    </style>
         .token-modal-overlay {
             display: none;
             position: fixed;
@@ -593,6 +672,7 @@
                 <button class="panel-tab" onclick="switchTab('errors')">Errors</button>
                 <button class="panel-tab" onclick="switchTab('variables')">Variables</button>
                 <button class="panel-tab" onclick="switchTab('stats')">Statistics</button>
+                <button class="panel-tab" onclick="switchTab('ir')">IR Code</button>
                 <button class="panel-tab" onclick="switchTab('About')">About</button>
                 
             </div>
@@ -608,6 +688,10 @@
             <div id="variables" class="panel-content">
                 <div id="variables-box" style="color: #8b949e; font-style: italic;">No variables</div>
             </div>
+            <div id="ir" class="panel-content">
+                <div id="ir-box" class="ir-empty">Run your code to see the Intermediate Representation</div>
+            </div>
+
             <div id="About" class="panel-content">
                 <div id="About" style="color: #8b949e; font-style: italic;">Developer :- Suraj Keshri<br>Bharati vidyapeeth college of engineering</br></div>
             </div>
@@ -762,6 +846,9 @@
                         buildTokenTable(synthetic);
                         document.getElementById('tokens-count').textContent = result.stats.tokens;
                     }
+
+                    // Render IR code
+                    if (result.ir) { _lastIR = result.ir; renderIR(result.ir); }
                 } else {
                     const error = result.error;
                     let errorHtml = `<div class="error-container">
@@ -816,6 +903,93 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
+        // ── IR Code Viewer ─────────────────────────────────────
+
+        function irOpClass(op) {
+            if (op === 'FUNC')   return 'ir-op-func';
+            if (op === 'LABEL')  return 'ir-op-label';
+            if (['JUMP','JUMP_IF_TRUE','JUMP_IF_FALSE'].includes(op)) return 'ir-op-jump';
+            if (op === 'CALL')   return 'ir-op-call';
+            if (op === 'RETURN') return 'ir-op-return';
+            if (['ASSIGN','VAR_ASSIGN','VAR_DECL','LOAD','PARAM_DECL'].includes(op)) return 'ir-op-assign';
+            if (['+','-','*','/','%','<','>','<=','>=','==','!=','&&','||','UNARY'].includes(op)) return 'ir-op-arith';
+            return 'ir-op-default';
+        }
+
+        function irRowClass(op) {
+            if (op === 'FUNC')  return 'ir-func-row';
+            if (op === 'LABEL') return 'ir-label-row';
+            return '';
+        }
+
+        function colorArg(arg) {
+            if (!arg || arg === 'null') return '';
+            arg = String(arg);
+            if (/^t\d+$/.test(arg))  return `<span class="ir-temp">${arg}</span>`;
+            if (/^L\d+$/.test(arg))  return `<span class="ir-str">${arg}</span>`;
+            if (/^@str:/.test(arg))  return `<span class="ir-str">"${arg.split(':').slice(2).join(':')}"</span>`;
+            if (/^-?\d+(\.\d+)?$/.test(arg)) return `<span class="ir-num">${arg}</span>`;
+            return `<span class="ir-var">${arg}</span>`;
+        }
+
+        function renderIR(irLines) {
+            const box = document.getElementById('ir-box');
+            if (!irLines || irLines.length === 0) {
+                box.className = 'ir-empty';
+                box.innerHTML = 'No IR instructions generated.';
+                return;
+            }
+            box.className = '';
+
+            // Parse each IR string back into parts
+            const rows = irLines.map((line, i) => {
+                // Format: "OP arg1 arg2 arg3 -> result"
+                const parts = line.split(' ');
+                const op = parts[0];
+                const hasResult = line.includes('->');
+                let args = '', result = '';
+                if (hasResult) {
+                    const splitIdx = parts.indexOf('->');
+                    args = parts.slice(1, splitIdx).map(colorArg).join('  ');
+                    result = `<span class="ir-arrow">→</span> <span class="ir-temp">${parts[splitIdx+1]}</span>`;
+                } else {
+                    args = parts.slice(1).map(colorArg).join('  ');
+                }
+                const rowCls = irRowClass(op);
+                const opCls  = irOpClass(op);
+                return `<tr class="${rowCls}">
+                    <td class="ir-idx">${i}</td>
+                    <td><span class="ir-badge ${opCls}">${op}</span></td>
+                    <td class="ir-args">${args}</td>
+                    <td class="ir-args">${result}</td>
+                </tr>`;
+            }).join('');
+
+            box.innerHTML = `
+                <div class="ir-toolbar">
+                    <span class="ir-meta">${irLines.length} instructions generated</span>
+                    <button class="ir-copy-btn" onclick="copyIR()">⎘ Copy IR</button>
+                </div>
+                <div style="overflow-x:auto">
+                <table class="ir-table">
+                    <thead><tr>
+                        <th>#</th><th>Opcode</th><th>Operands</th><th>Result</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                </div>`;
+        }
+
+        let _lastIR = [];
+        function copyIR() {
+            navigator.clipboard.writeText(_lastIR.join('\n'))
+                .then(() => { 
+                    const btn = document.querySelector('.ir-copy-btn');
+                    btn.textContent = '✓ Copied!';
+                    setTimeout(() => btn.textContent = '⎘ Copy IR', 1500);
+                });
+        }
+
         // ── Token Modal ────────────────────────────────────────
 
         // Classify a token type string into a display category
@@ -856,7 +1030,8 @@
                 int:'INT', float:'FLOAT', char:'CHAR', void:'VOID',
                 if:'IF', else:'ELSE', while:'WHILE', for:'FOR', do:'DO',
                 return:'RETURN', struct:'STRUCT', sizeof:'SIZEOF',
-                break:'BREAK', continue:'CONTINUE', static:'STATIC', const:'CONST'
+                break:'BREAK', continue:'CONTINUE', static:'STATIC', const:'CONST',
+                main:'MAIN'
             };
 
             function advance() {
