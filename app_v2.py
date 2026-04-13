@@ -141,10 +141,26 @@ def compile_code():
             output = vm.run()
             
             elapsed = (datetime.now() - start_time).total_seconds() * 1000
+
+            # Serialize tokens for the frontend
+            tokens_data = [
+                {
+                    'type': t.type,
+                    'value': str(t.value) if t.value is not None else '',
+                    'line': t.line,
+                    'column': t.column
+                }
+                for t in tokens
+            ]
+
+            # Serialize IR instructions
+            ir_data = [str(instr) for instr in ir_gen.instructions]
             
             return jsonify({
                 'success': True,
                 'output': output if output else '[Program finished with no output]',
+                'tokens': tokens_data,
+                'ir': ir_data,
                 'stats': {
                     'time_ms': elapsed,
                     'tokens': len(tokens),
