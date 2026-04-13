@@ -35,6 +35,18 @@ class Parser:
         self.advance()
         return token
 
+    def expect_name(self):
+        """Accept ID or any keyword used as a name (e.g. MAIN)."""
+        if self.current_token.type not in ("ID", "MAIN"):
+            raise CompileError(
+                f"Expected identifier but got '{self.current_token.type}'",
+                self.current_token.line,
+                self.current_token.column
+            )
+        token = self.current_token
+        self.advance()
+        return token
+
     def match(self, *types):
         return self.current_token.type in types
 
@@ -53,7 +65,7 @@ class Parser:
         """Parse a type like: int, float, int*, int[], struct Node, etc."""
         if self.match("STRUCT"):
             self.advance()
-            struct_name = self.expect("ID").value
+            struct_name = self.expect_name().value
             type_node = TypeNode(base_type="struct", struct_name=struct_name)
         elif self.match("INT", "FLOAT", "CHAR", "VOID"):
             type_node = TypeNode(base_type=self.current_token.value)
@@ -102,13 +114,13 @@ class Parser:
     def parse_struct(self):
         line = self.current_token.line
         self.expect("STRUCT")
-        name = self.expect("ID").value
+        name = self.expect_name().value
         self.expect("LBRACE")
 
         members = []
         while not self.match("RBRACE", "EOF"):
             member_type = self.parse_type()
-            member_name = self.expect("ID").value
+            member_name = self.expect_name().value
             members.append((member_type, member_name))
             self.expect("SEMI")
 
@@ -121,14 +133,14 @@ class Parser:
     def parse_function(self):
         line = self.current_token.line
         return_type = self.parse_type()
-        func_name = self.expect("ID").value
+        func_name = self.expect_name().value
         self.expect("LPAREN")
 
         params = []
         if not self.match("RPAREN"):
             while True:
                 param_type = self.parse_type()
-                param_name = self.expect("ID").value
+                param_name = self.expect_name().value
                 params.append((param_type, param_name))
                 if not self.match("COMMA"):
                     break
@@ -183,7 +195,7 @@ class Parser:
     def parse_var_decl(self):
         line = self.current_token.line
         type_node = self.parse_type()
-        name = self.expect("ID").value
+        name = self.expect_name().value
         value = None
 
         if self.match("ASSIGN"):
@@ -388,12 +400,12 @@ class Parser:
 
             elif self.match("DOT"):  # Member access
                 self.advance()
-                member = self.expect("ID").value
+                member = self.expect_name().value
                 expr = MemberAccess(expr, member, is_pointer=False)
 
             elif self.match("ARROW"):  # Pointer member access
                 self.advance()
-                member = self.expect("ID").value
+                member = self.expect_name().value
                 expr = MemberAccess(expr, member, is_pointer=True)
 
             elif self.match("INC", "DEC"):  # Postfix ++ and --
@@ -440,7 +452,7 @@ class Parser:
             return Number(tok.value, tok.line, tok.column)
 
         # Identifier or function call
-        if tok.type == "ID":
+        if tok.type in ("ID", "MAIN"):
             self.advance()
             if self.match("LPAREN"):  # Function call
                 self.advance()
