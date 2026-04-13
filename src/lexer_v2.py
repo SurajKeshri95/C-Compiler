@@ -26,6 +26,7 @@ KEYWORDS = {
     "continue": "CONTINUE",
     "static": "STATIC",
     "const": "CONST",
+    "main": "MAIN",
 }
 
 class LexerError(Exception):
